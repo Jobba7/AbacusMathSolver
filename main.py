@@ -2,7 +2,7 @@ import cv2
 import numpy as np
 
 # Lade das Bild des Abacus
-image = cv2.imread("abacus2.jpg")
+image = cv2.imread("abacus.jpg")
 
 # Bildschirmgröße ermitteln
 screen_res = 1280, 720  # Beispielwert für FullHD oder eine kleinere Größe wählen
