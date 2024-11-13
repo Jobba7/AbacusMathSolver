@@ -2,6 +2,7 @@ import cv2
 import numpy as np
 import time
 import pyttsx3
+import random
 
 # Starte die Webcam
 cap = cv2.VideoCapture(1)  # '0' bedeutet die Standard-Webcam, ggf. anpassen, falls mehrere Kameras vorhanden sind
@@ -13,8 +14,37 @@ if not cap.isOpened():
 # Initialisiere die Text-to-Speech Engine
 engine = pyttsx3.init()
 
-# Startzeit für die Überprüfung alle 10 Sekunden
+# Initialisiere Variablen
 last_check_time = time.time()
+red_dots_count = 0
+blue_dots_count = 0
+task_started = False
+task_answered = False
+task = None
+
+# Funktion für mathematische Aufgaben
+def generate_math_task():
+    a = random.randint(1, 5)
+    b = random.randint(1, 5)
+    operator = '+'
+    return a, b, a + b, f"{a} plus {b}"
+    operator = random.choice(['+', '-', '*'])
+    if operator == '+':
+        return a, b, a + b, f"{a} + {b}"
+    elif operator == '-':
+        return a, b, a - b, f"{a} - {b}"
+    elif operator == '*':
+        return a, b, a * b, f"{a} * {b}"
+
+# Mathematische Aufgabe generieren
+def ask_question():
+    global task
+    a, b, correct_answer, question = generate_math_task()
+    task = (a, b, correct_answer, question)
+    engine.say(f"Bitte rechne {question}")
+    engine.runAndWait()
+
+ask_question()  # Frage gleich zu Beginn stellen
 
 while True:
     # Lese den aktuellen Frame der Webcam
@@ -79,18 +109,22 @@ while True:
             cv2.circle(frame, (int(x), int(y)), int(radius), (255, 0, 0), 2)  # Zeichne blaue Umrandung für blaue Kugeln
             blue_dots_count += 1
 
-    # Alle 10 Sekunden die Anzahl der Kugeln als Audio ausgeben
-    current_time = time.time()
-    if current_time - last_check_time >= 10:
-        total_dots_count = red_dots_count + blue_dots_count
-        engine.say(f"Es wurden insgesamt {total_dots_count} Kugeln erkannt.")
-        engine.runAndWait()
-        last_check_time = current_time  # Zeit für die nächste Überprüfung aktualisieren
+    
+
+    # Überprüfen, ob der Schüler mit der Aufgabe fertig ist
+    if task:
+        if red_dots_count == task[0] and blue_dots_count == task[1] or red_dots_count == task[1] and blue_dots_count == task[0]:
+            engine.say(f"Richtige Antwort! {red_dots_count} rote Kugeln und {blue_dots_count} blaue Kugeln, ergeben insgesamt {task[2]}")
+            engine.runAndWait()
+            task_answered = True
+            ask_question()  # Neue Frage stellen
 
     # Zeige die Anzahl der erkannten Kugeln im Fenster
     cv2.putText(frame, f"Rote Punkte: {red_dots_count}", (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
     cv2.putText(frame, f"Blaue Punkte: {blue_dots_count}", (10, 60), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (255, 0, 0), 2)
     cv2.putText(frame, f"Insgesamt: {red_dots_count + blue_dots_count}", (10, 90), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 0), 2)
+    cv2.putText(frame, f"Aufgabe: {task[3]}", (10, 120), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (255, 255, 255), 2)
+
 
     # Zeige das Ergebnis im Live-Bild
     cv2.imshow("Erkannte Kugeln (Live)", frame)
