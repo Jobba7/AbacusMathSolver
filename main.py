@@ -29,15 +29,7 @@ last_change_time = time.time()
 def generate_math_task():
     a = random.randint(1, 5)
     b = random.randint(1, 5)
-    operator = '+'
     return a, b, a + b, f"{a} plus {b}"
-    operator = random.choice(['+', '-', '*'])
-    if operator == '+':
-        return a, b, a + b, f"{a} + {b}"
-    elif operator == '-':
-        return a, b, a - b, f"{a} - {b}"
-    elif operator == '*':
-        return a, b, a * b, f"{a} * {b}"
 
 # Mathematische Aufgabe generieren
 def ask_question():
@@ -118,7 +110,7 @@ while True:
         last_red_dots = red_dots_count
         last_blue_dots = blue_dots_count
 
-    # Aufgabe überprüfen, wenn die Kugelanzahl 5 Sekunden lang stabil war
+    # Aufgabe überprüfen, wenn die Kugelanzahl 3 Sekunden lang stabil war
     if time.time() - last_change_time > 3 and task:
         if red_dots_count == task[0] and blue_dots_count == task[1] or red_dots_count == task[1] and blue_dots_count == task[0]:
             engine.say(f"Richtige Antwort! {red_dots_count} rote Kugeln und {blue_dots_count} blaue Kugeln, ergeben insgesamt {task[2]}")
