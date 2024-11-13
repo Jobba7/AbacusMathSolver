@@ -21,6 +21,9 @@ blue_dots_count = 0
 task_started = False
 task_answered = False
 task = None
+last_red_dots = 0
+last_blue_dots = 0
+last_change_time = time.time()
 
 # Funktion für mathematische Aufgaben
 def generate_math_task():
@@ -109,14 +112,17 @@ while True:
             cv2.circle(frame, (int(x), int(y)), int(radius), (255, 0, 0), 2)  # Zeichne blaue Umrandung für blaue Kugeln
             blue_dots_count += 1
 
-    
+    # Überprüfen, ob die Anzahl der Kugeln sich geändert hat und für 5 Sekunden stabil bleibt
+    if red_dots_count != last_red_dots or blue_dots_count != last_blue_dots:
+        last_change_time = time.time()  # Aktualisiere die Zeit, wenn sich die Anzahl ändert
+        last_red_dots = red_dots_count
+        last_blue_dots = blue_dots_count
 
-    # Überprüfen, ob der Schüler mit der Aufgabe fertig ist
-    if task:
+    # Aufgabe überprüfen, wenn die Kugelanzahl 5 Sekunden lang stabil war
+    if time.time() - last_change_time > 3 and task:
         if red_dots_count == task[0] and blue_dots_count == task[1] or red_dots_count == task[1] and blue_dots_count == task[0]:
             engine.say(f"Richtige Antwort! {red_dots_count} rote Kugeln und {blue_dots_count} blaue Kugeln, ergeben insgesamt {task[2]}")
             engine.runAndWait()
-            task_answered = True
             ask_question()  # Neue Frage stellen
 
     # Zeige die Anzahl der erkannten Kugeln im Fenster
@@ -124,7 +130,6 @@ while True:
     cv2.putText(frame, f"Blaue Punkte: {blue_dots_count}", (10, 60), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (255, 0, 0), 2)
     cv2.putText(frame, f"Insgesamt: {red_dots_count + blue_dots_count}", (10, 90), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 0), 2)
     cv2.putText(frame, f"Aufgabe: {task[3]}", (10, 120), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (255, 255, 255), 2)
-
 
     # Zeige das Ergebnis im Live-Bild
     cv2.imshow("Erkannte Kugeln (Live)", frame)
