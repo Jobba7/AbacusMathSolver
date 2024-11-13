@@ -40,22 +40,27 @@ while True:
     # Masken für Rot kombinieren
     mask_red = cv2.bitwise_or(mask_red_1, mask_red_2)
 
-
     # Blaue Kugeln mit begrenzter Helligkeit und hoher Sättigung
     lower_blue = np.array([90, 150, 50])  # Untere Grenze für Blautöne
     upper_blue = np.array([130, 255, 255])  # Obere Grenze für Blautöne
     mask_blue = cv2.inRange(hsv_image, lower_blue, upper_blue)
 
-
-
     # Finde die Konturen der roten Kugeln
     contours_red, _ = cv2.findContours(mask_red, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
     red_dots_count = 0
     for contour in contours_red:
-        (x, y), radius = cv2.minEnclosingCircle(contour)
-        if radius > 5:
-            cv2.circle(frame, (int(x), int(y)), int(radius), (0, 0, 255), 2)  # Zeichne rote Umrandung für rote Kugeln
-            red_dots_count += 1
+        area = cv2.contourArea(contour)
+        perimeter = cv2.arcLength(contour, True)
+        
+        if perimeter > 0:
+            circularity = 4 * np.pi * (area / (perimeter ** 2))  # Rundheitsberechnung
+            
+            # Filter für Rundheit und Größe, um nur Kugeln zu erkennen
+            if 0.7 < circularity < 1.2 and 100 < area < 2000:
+                (x, y), radius = cv2.minEnclosingCircle(contour)
+                if radius > 5:
+                    cv2.circle(frame, (int(x), int(y)), int(radius), (0, 0, 255), 2)  # Zeichne rote Umrandung für rote Kugeln
+                    red_dots_count += 1
 
     # Finde die Konturen der blauen Kugeln
     contours_blue, _ = cv2.findContours(mask_blue, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
