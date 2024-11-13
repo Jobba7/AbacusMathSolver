@@ -1,5 +1,7 @@
 import cv2
 import numpy as np
+import time
+import pyttsx3
 
 # Starte die Webcam
 cap = cv2.VideoCapture(1)  # '0' bedeutet die Standard-Webcam, ggf. anpassen, falls mehrere Kameras vorhanden sind
@@ -7,6 +9,12 @@ cap = cv2.VideoCapture(1)  # '0' bedeutet die Standard-Webcam, ggf. anpassen, fa
 if not cap.isOpened():
     print("Fehler beim Zugriff auf die Webcam")
     exit()
+
+# Initialisiere die Text-to-Speech Engine
+engine = pyttsx3.init()
+
+# Startzeit für die Überprüfung alle 10 Sekunden
+last_check_time = time.time()
 
 while True:
     # Lese den aktuellen Frame der Webcam
@@ -70,6 +78,14 @@ while True:
         if radius > 5:
             cv2.circle(frame, (int(x), int(y)), int(radius), (255, 0, 0), 2)  # Zeichne blaue Umrandung für blaue Kugeln
             blue_dots_count += 1
+
+    # Alle 10 Sekunden die Anzahl der Kugeln als Audio ausgeben
+    current_time = time.time()
+    if current_time - last_check_time >= 10:
+        total_dots_count = red_dots_count + blue_dots_count
+        engine.say(f"Es wurden insgesamt {total_dots_count} Kugeln erkannt.")
+        engine.runAndWait()
+        last_check_time = current_time  # Zeit für die nächste Überprüfung aktualisieren
 
     # Zeige die Anzahl der erkannten Kugeln im Fenster
     cv2.putText(frame, f"Rote Punkte: {red_dots_count}", (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
