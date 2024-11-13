@@ -5,7 +5,7 @@ import pyttsx3
 import random
 
 # Starte die Webcam
-cap = cv2.VideoCapture(1)  # '0' bedeutet die Standard-Webcam, ggf. anpassen, falls mehrere Kameras vorhanden sind
+cap = cv2.VideoCapture(0)  # '0' bedeutet die Standard-Webcam, ggf. anpassen, falls mehrere Kameras vorhanden sind
 
 if not cap.isOpened():
     print("Fehler beim Zugriff auf die Webcam")
