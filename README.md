@@ -40,6 +40,10 @@ Stelle sicher, dass folgende Software und Bibliotheken installiert sind:
    ```bash
    pip install -r requirements.txt
    ```
+   Abhängigkeiten aktualisieren (für Entwickler):
+   ```bash
+   pip freeze > requirements.txt
+   ```
 
 ## Ausführung
 
