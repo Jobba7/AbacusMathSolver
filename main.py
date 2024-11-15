@@ -39,7 +39,7 @@ def ask_question():
     engine.say(f"Bitte rechne {question}")
     engine.runAndWait()
 
-ask_question()  # Frage gleich zu Beginn stellen
+firstQuestion = True
 
 while True:
     # Lese den aktuellen Frame der Webcam
@@ -121,10 +121,15 @@ while True:
     cv2.putText(frame, f"Rote Punkte: {red_dots_count}", (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
     cv2.putText(frame, f"Blaue Punkte: {blue_dots_count}", (10, 60), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (255, 0, 0), 2)
     cv2.putText(frame, f"Insgesamt: {red_dots_count + blue_dots_count}", (10, 90), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 0), 2)
-    cv2.putText(frame, f"Aufgabe: {task[3]}", (10, 120), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (255, 255, 255), 2)
+    if task:
+        cv2.putText(frame, f"Aufgabe: {task[3]}", (10, 120), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (255, 255, 255), 2)
 
     # Zeige das Ergebnis im Live-Bild
     cv2.imshow("Erkannte Kugeln (Live)", frame)
+
+    if firstQuestion:
+        ask_question()
+        firstQuestion = False
 
     # Beenden mit der 'q'-Taste
     if cv2.waitKey(1) & 0xFF == ord('q'):
